@@ -1,56 +1,79 @@
-# Health Calculator Microservice
+Health Calculator Microservice
 
-Ce projet est un microservice Python qui calcule l'IMC et le BMR via une API REST. Il est conteneurisé avec Docker et déployé sur Azure App Service via GitHub Actions.
+Ce projet est un microservice Python qui calcule l'IMC (Indice de Masse Corporelle) et le BMR (Taux Métabolique de Base) via une API REST. Il est conteneurisé avec Docker et déployé sur Azure App Service via un pipeline CI/CD GitHub Actions.
 
 ## Prérequis
 
 - Python 3.9+
+- pip
 - Docker
-- Make
+- Git
 - Compte GitHub
 - Compte Azure
 
 ## Installation
 
-1. Clonez ce dépôt:
+1. Installez les prérequis système :
 
-   git clone https://github.com/votre-username/health-calculator-service.git
+   sudo apt-get update
+   sudo apt-get install python3 python3-pip python3-venv
+
+
+2. Clonez ce dépôt :
+
+   git clone 
    cd health-calculator-service
 
 
-2. Installez les dépendances:
+3. Initialisez le projet :
 
    make init
 
 
 ## Utilisation
 
-- Exécuter l'application localement:
+1. Lancez l'application :
 
-  make run
-
-
-- Exécuter les tests:
-
-  make test
+   make run
 
 
-- Construire l'image Docker:
+2. Utilisez les endpoints :
+- POST /bmi : `{"height": float, "weight": float}`
+- POST /bmr : `{"height": float, "weight": float, "age": int, "gender": string}`
 
-  make build
+Exemple avec curl :
+
+   curl -X POST -H "Content-Type: application/json" -d '{"height": 1.75, "weight": 70}' http://localhost:5000/bmi
 
 
-## API Endpoints
+3. Arrêtez l'application :
 
-- POST /bmi : Calcule l'IMC
-- Body: { "height": float, "weight": float }
-- POST /bmr : Calcule le BMR
-- Body: { "height": float, "weight": float, "age": int, "gender": string }
+   make stop
+
+
+## Tests
+
+Exécutez les tests unitaires :
+
+make test
+
 
 ## Déploiement
 
 Le déploiement est automatisé via GitHub Actions. Chaque push sur la branche principale déclenche le pipeline CI/CD.
 
+## Commandes utiles
+
+- `make run` : Lance l'application
+- `make stop` : Arrête l'application
+- `make test` : Exécute les tests
+- `make build` : Construit l'image Docker
+- `make clean` : Nettoie les fichiers temporaires
+- `make status` : Vérifie le statut de l'application
+- `make logs` : Affiche les logs de l'application
+
 ## Contribution
 
-Les pull requests sont les bienvenues. Pour les changements majeurs, ouvrez d'abord une issue.
+Les pull requests sont les bienvenues. Pour les changements majeurs, veuillez d'abord ouvrir une issue pour discuter de ce que vous aimeriez changer.
+
+Projet réalisé par Khalid OUATIK
