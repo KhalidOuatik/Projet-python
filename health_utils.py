@@ -20,3 +20,4 @@ def calculate_bmr(height, weight, age, gender):
     else:
         raise ValueError("Le genre doit être 'male' ou 'female'")
 
+    return round(BMR, 2)

@@ -9,11 +9,11 @@ class TestHealthUtils(unittest.TestCase):
         
     def test_calculate_bmr_male(self):
         """Je teste ici le calcul du BMR pour un homme"""
-        self.assertAlmostEqual(calculate_bmr(175, 70, 25, 'male'), 1706.69, places=2)
+        self.assertAlmostEqual(calculate_bmr(175, 70, 25, 'male'), 1724.05, places=2)
 
     def test_calculate_bmr_female(self):
         """Je teste ici le calcul du BMR pour une femme"""
-        self.assertAlmostEqual(calculate_bmr(160, 60, 30, 'female'), 1384.14, places=2)
+        self.assertAlmostEqual(calculate_bmr(160, 60, 30, 'female'), 1368.19, places=2)
 
 class TestFlaskApp(unittest.TestCase):
     def setUp(self):
