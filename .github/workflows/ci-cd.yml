@@ -74,4 +74,4 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'python-projet'
-          slot-name: 'Production
+          slot-name: 'Production'
