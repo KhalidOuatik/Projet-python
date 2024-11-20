@@ -4,49 +4,32 @@ Ce projet est un microservice Python qui calcule l'IMC (Indice de Masse Corporel
 
 ## Prérequis
 
-- Python 3.9+
+- Python 3.11+
 - pip
-- Docker
 - Git
-- Compte GitHub
+- Compte GitHub (pour le fork et le déploiement)
 - Compte Azure (pour le déploiement)
 
-## Installation
+## Installation et Configuration Locale
 
 1. Clonez ce dépôt :
 
-   git clone https://github.com/KhalidOuatik/Projet-python.git
+   git clone https://github.com/votre-username/Projet-python.git
    cd Projet-python
 
 
-2. Installez les dépendances :
-
-   pip install -r requirements.txt
-
-
-## Configuration pour le développement local
-
-1. Créez un environnement virtuel :
+2. Créez et activez un environnement virtuel :
 
    python -m venv venv
+   source venv/bin/activate  # Sur Windows, utilisez venv\Scripts\activate
 
 
-2. Activez l'environnement virtuel :
-- Sur Windows :
-  ```
-  venv\Scripts\activate
-  ```
-- Sur macOS et Linux :
-  ```
-  source venv/bin/activate
-  ```
-
-3. Installez les dépendances du projet :
+3. Installez les dépendances :
 
    pip install -r requirements.txt
 
 
-## Utilisation
+## Exécution Locale
 
 1. Lancez l'application :
 
@@ -55,33 +38,48 @@ Ce projet est un microservice Python qui calcule l'IMC (Indice de Masse Corporel
 
 2. L'application sera accessible à l'adresse `http://localhost:5000`
 
-3. Utilisez les endpoints :
-- POST /bmi : `{"height": float, "weight": float}`
-- POST /bmr : `{"height": float, "weight": float, "age": int, "gender": string}`
-
-Exemple avec curl :
+3. Testez les endpoints avec curl ou un outil similaire :
 
    curl -X POST -H "Content-Type: application/json" -d '{"height": 1.75, "weight": 70}' http://localhost:5000/bmi
+   curl -X POST -H "Content-Type: application/json" -d '{"height": 175, "weight": 70, "age": 25, "gender": "male"}' http://localhost:5000/bmr
 
 
-## Tests
+## Exécution des Tests
 
-Exécutez les tests unitaires :
+Pour exécuter les tests unitaires :
 
 python -m unittest discover
 
 
-## Déploiement
+## Déploiement sur Azure
 
-Le déploiement est automatisé via GitHub Actions. Chaque push sur la branche principale déclenche le pipeline CI/CD.
+Le déploiement est automatisé via GitHub Actions. Pour configurer le déploiement sur votre propre environnement Azure :
 
-Pour configurer le déploiement sur votre propre environnement Azure :
+1. Forkez ce dépôt sur votre compte GitHub.
 
-1. Créez une Web App sur Azure.
-2. Dans les paramètres de votre dépôt GitHub, ajoutez les secrets suivants :
-   - AZURE_WEBAPP_NAME : Le nom de votre Web App Azure
-   - AZURE_WEBAPP_PUBLISH_PROFILE : Le profil de publication de votre Web App (téléchargeable depuis le portail Azure)
+2. Créez une Web App sur Azure :
+   - Allez sur le portail Azure et créez une nouvelle Web App.
+   - Notez le nom de votre App Service.
 
-3. Mettez à jour le fichier `.github/workflows/main_python-projet.yml` avec le nom de votre application Azure.
+3. Configurez les secrets GitHub :
+   - Dans votre fork GitHub, allez dans Settings > Secrets and variables > Actions.
+   - Ajoutez les secrets suivants :
+     - `AZUREAPPSERVICE_CLIENTID`
+     - `AZUREAPPSERVICE_TENANTID`
+     - `AZUREAPPSERVICE_SUBSCRIPTIONID`
+   (Vous pouvez obtenir ces valeurs depuis le portail Azure)
 
-Projet réalisé par Khalid OUATIK
+4. Mettez à jour le fichier `.github/workflows/ci-cd.yml` :
+   - Remplacez `'python-projet'` par le nom de votre App Service Azure.
+
+5. Poussez un changement sur la branche main pour déclencher le déploiement.
+
+## Structure du Projet
+
+- `app.py`: Point d'entrée de l'application Flask.
+- `health_utils.py`: Fonctions utilitaires pour les calculs de santé.
+- `test.py`: Tests unitaires.
+- `requirements.txt`: Dépendances du projet.
+- `.github/workflows/ci-cd.yml`: Configuration du workflow GitHub Actions.
+
+Projet réalisé par Khalid OUATIK pour un projet Python/Azure
