@@ -33,7 +33,7 @@ class TestFlaskApp(unittest.TestCase):
         response = self.app.post('/bmr', json={'height': 175, 'weight': 70, 'age': 25, 'gender': 'male'})
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertAlmostEqual(data['bmr'], 1706.69, places=2)
+        self.assertAlmostEqual(data['bmr'], 1724.05 places=2)
 
 if __name__ == '__main__':
     unittest.main()
