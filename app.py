@@ -9,11 +9,23 @@ def home():
 
 @app.route('/bmi', methods=['POST'])
 def bmi():
-    # Votre code pour le calcul de l'IMC
+    # Assurez-vous qu'il y a du code ici, indenté correctement
+    data = request.json
+    height = data['height']
+    weight = data['weight']
+    result = calculate_bmi(height, weight)
+    return jsonify({"bmi": result})
 
 @app.route('/bmr', methods=['POST'])
 def bmr():
-    # Votre code pour le calcul du BMR
+    # Assurez-vous qu'il y a du code ici, indenté correctement
+    data = request.json
+    height = data['height']
+    weight = data['weight']
+    age = data['age']
+    gender = data['gender']
+    result = calculate_bmr(height, weight, age, gender)
+    return jsonify({"bmr": result})
 
 if __name__ == '__main__':
     app.run(debug=True)
