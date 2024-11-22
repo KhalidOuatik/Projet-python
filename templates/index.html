@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de santé</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; }
+        input, select, button { margin: 10px 0; padding: 5px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Calculateur de santé</h1>
+    <form id="healthForm">
+        <input type="number" id="height" placeholder="Taille (cm)" required step="0.01">
+        <input type="number" id="weight" placeholder="Poids (kg)" required step="0.1">
+        <input type="number" id="age" placeholder="Âge" required>
+        <select id="gender" required>
+            <option value="">Sélectionnez le genre</option>
+            <option value="male">Homme</option>
+            <option value="female">Femme</option>
+        </select>
+        <button type="submit">Calculer</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('healthForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const height = document.getElementById('height').value / 100; // Convert cm to m for BMI
+            const weight = document.getElementById('weight').value;
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+
+            try {
+                const bmiFetch = fetch('/bmi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ height, weight })
+                });
+
+                const bmrFetch = fetch('/bmr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ height: height * 100, weight, age, gender })
+                });
+
+                const [bmiResponse, bmrResponse] = await Promise.all([bmiFetch, bmrFetch]);
+                const bmiData = await bmiResponse.json();
+                const bmrData = await bmrResponse.json();
+
+                document.getElementById('result').innerHTML = `
+                    IMC : ${bmiData.bmi.toFixed(2)}<br>
+                    BMR : ${bmrData.bmr.toFixed(2)} calories/jour
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 'Une erreur est survenue lors du calcul.';
+            }
+        });
+    </script>
+</body>
+</html>
+

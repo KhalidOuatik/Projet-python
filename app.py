@@ -5,6 +5,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
+    return render_template('index.html')
+
+@app.route('/')
+def home():
     return "Bienvenue dans l'API de calcul de santé!"
 
 @app.route('/bmi', methods=['POST'])
