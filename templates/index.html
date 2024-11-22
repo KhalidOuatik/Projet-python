@@ -37,20 +37,18 @@
             console.log('Sending data:', { height, weight, age, gender });
 
             try {
-                const bmiFetch = fetch('/bmi', {
+                const bmiResponse = await fetch('/bmi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ height, weight })
                 });
+                const bmiData = await bmiResponse.json();
 
-                const bmrFetch = fetch('/bmr', {
+                const bmrResponse = await fetch('/bmr', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ height, weight, age, gender })
                 });
-
-                const [bmiResponse, bmrResponse] = await Promise.all([bmiFetch, bmrFetch]);
-                const bmiData = await bmiResponse.json();
                 const bmrData = await bmrResponse.json();
 
                 console.log('Received response:', bmiData, bmrData);
@@ -60,7 +58,7 @@
                 }
 
                 document.getElementById('result').innerHTML = `
-                    IMC : ${bmiData.bmi}<br>
+                    IMC (BMI) : ${bmiData.bmi}<br>
                     BMR : ${bmrData.bmr} calories/jour
                 `;
             } catch (error) {
