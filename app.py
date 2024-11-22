@@ -14,7 +14,7 @@ def bmi():
     try:
         data = request.json
         app.logger.info(f"Received BMI data: {data}")
-        height = float(data['height'])
+        height = float(data['height']) / 100  # Convert cm to meters
         weight = float(data['weight'])
         result = calculate_bmi(height, weight)
         app.logger.info(f"Calculated BMI: {result}")

@@ -23,7 +23,7 @@ class TestFlaskApp(unittest.TestCase):
 
     def test_bmi_endpoint(self):
         """Je teste ici l'endpoint /bmi"""
-        response = self.app.post('/bmi', json={'height': 1.75, 'weight': 70})
+        response = self.app.post('/bmi', json={'height': 175, 'weight': 70})
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertAlmostEqual(data['bmi'], 22.86, places=2)
