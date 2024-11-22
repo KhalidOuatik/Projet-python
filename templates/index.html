@@ -14,7 +14,7 @@
 <body>
     <h1>Calculateur de santé</h1>
     <form id="healthForm">
-        <input type="number" id="height" placeholder="Taille (cm)" required step="0.01">
+        <input type="number" id="height" placeholder="Taille (cm)" required step="0.1">
         <input type="number" id="weight" placeholder="Poids (kg)" required step="0.1">
         <input type="number" id="age" placeholder="Âge" required>
         <select id="gender" required>
@@ -29,10 +29,12 @@
     <script>
         document.getElementById('healthForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const height = document.getElementById('height').value / 100; // Convert cm to m for BMI
-            const weight = document.getElementById('weight').value;
-            const age = document.getElementById('age').value;
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const age = parseInt(document.getElementById('age').value);
             const gender = document.getElementById('gender').value;
+
+            console.log('Sending data:', { height, weight, age, gender });
 
             try {
                 const bmiFetch = fetch('/bmi', {
@@ -44,16 +46,22 @@
                 const bmrFetch = fetch('/bmr', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ height: height * 100, weight, age, gender })
+                    body: JSON.stringify({ height, weight, age, gender })
                 });
 
                 const [bmiResponse, bmrResponse] = await Promise.all([bmiFetch, bmrFetch]);
                 const bmiData = await bmiResponse.json();
                 const bmrData = await bmrResponse.json();
 
+                console.log('Received response:', bmiData, bmrData);
+
+                if (bmiData.error || bmrData.error) {
+                    throw new Error(bmiData.error || bmrData.error);
+                }
+
                 document.getElementById('result').innerHTML = `
-                    IMC : ${bmiData.bmi.toFixed(2)}<br>
-                    BMR : ${bmrData.bmr.toFixed(2)} calories/jour
+                    IMC : ${bmiData.bmi}<br>
+                    BMR : ${bmrData.bmr} calories/jour
                 `;
             } catch (error) {
                 console.error('Error:', error);
