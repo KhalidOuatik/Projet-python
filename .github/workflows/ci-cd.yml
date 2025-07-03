@@ -94,6 +94,8 @@ jobs:
           terraform -chdir=infra import azurerm_network_security_group.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
           # Import VNet
           terraform -chdir=infra import azurerm_virtual_network.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet" || true
+          # Import Subnet
+          terraform -chdir=infra import azurerm_subnet.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet/subnets/projet-python-subnet" || true
           # Import IP publique principale
           terraform -chdir=infra import azurerm_public_ip.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-python-public-ip" || true
           # Import IP publique Grafana
