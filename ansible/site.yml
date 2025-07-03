@@ -1,4 +1,18 @@
 ---
+- name: S'assurer que Python 3.8+ est installé
+  hosts: all
+  become: true
+  tasks:
+    - name: Installer Python 3.8
+      apt:
+        name: python3.8
+        state: present
+        update_cache: yes
+
+    - name: Forcer l'interpréteur Python 3.8 pour Ansible
+      set_fact:
+        ansible_python_interpreter: /usr/bin/python3.8
+
 - name: Provisionnement de base et test de connexion
   hosts: all
   become: true
