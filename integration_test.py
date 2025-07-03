@@ -7,15 +7,29 @@ GRAFANA_IP = os.environ.get("GRAFANA_IP", "127.0.0.1")
 PROMETHEUS_IP = os.environ.get("PROMETHEUS_IP", "127.0.0.1")
 
 # Helper pour attendre qu'un service soit up
-def wait_for_service(url, timeout=60):
-    for _ in range(timeout):
+def wait_for_service(url, timeout=60, interval=2, verbose=True):
+    """Attend que le service HTTP réponde 200 OK sur l'URL donnée, avec logs détaillés."""
+    start = time.time()
+    last_exception = None
+    while time.time() - start < timeout:
         try:
             r = requests.get(url, timeout=2)
             if r.status_code == 200:
+                if verbose:
+                    print(f"[OK] {url} -> 200")
                 return True
-        except Exception:
-            pass
-        time.sleep(1)
+            else:
+                if verbose:
+                    print(f"[WAIT] {url} -> {r.status_code}")
+        except Exception as e:
+            last_exception = e
+            if verbose:
+                print(f"[WAIT] {url} -> Exception: {e}")
+        time.sleep(interval)
+    if verbose:
+        print(f"[FAIL] {url} : timeout après {timeout}s")
+        if last_exception:
+            print(f"Dernière exception: {last_exception}")
     return False
 
 def test_flask_root():
