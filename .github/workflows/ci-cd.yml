@@ -17,6 +17,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Set Azure credentials
+      run: |
+        echo "ARM_CLIENT_ID=${{ secrets.AZUREAPPSERVICE_CLIENTID }}" >> $GITHUB_ENV
+        echo "ARM_CLIENT_SECRET=${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}" >> $GITHUB_ENV
+        echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}" >> $GITHUB_ENV
+        echo "ARM_TENANT_ID=${{ secrets.AZUREAPPSERVICE_TENANTID }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
 
       - name: Set up Python version
@@ -49,6 +55,7 @@ jobs:
             !venv/
 
 
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -66,6 +73,13 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
+
+      - name: Set Azure credentials
+        run: |
+          echo "ARM_CLIENT_ID=${{ secrets.AZUREAPPSERVICE_CLIENTID }}" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.AZUREAPPSERVICE_TENANTID }}" >> $GITHUB_ENV
 
       - name: Install SSH key
         run: |
