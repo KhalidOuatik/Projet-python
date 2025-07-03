@@ -174,7 +174,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ansible
-          pip install ansible[azure] community.docker
+          pip install ansible[azure]
+          ansible-galaxy collection install community.docker
 
       - name: Déployer l'infra et les services avec Ansible (Docker)
         env:
