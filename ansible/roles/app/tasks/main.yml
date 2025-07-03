@@ -24,13 +24,27 @@
     dest: /opt/flask_app/Dockerfile
     mode: '0644'
 
-- name: Copier tout le code Flask sur la VM
+- name: Copier tout le code Flask sur la VM (fichiers essentiels uniquement)
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../"
     dest: /opt/flask_app/
     mode: '0644'
     directory_mode: '0755'
-    remote_src: no
+    remote_src: false
+    exclude:
+      - venv
+      - .git
+      - __pycache__
+      - infra
+      - ansible
+      - docker
+      - templates
+      - '*.md'
+      - '*.yml'
+      - '*.yaml'
+      - '*.tf'
+      - '*.ini'
+      - '*.zip'
 
 - name: Construire l'image Flask
   community.docker.docker_image:

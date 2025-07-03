@@ -70,8 +70,7 @@
   roles:
     - app
 
-- name: Déployer Grafana/Prometheus/node_exporter (VM grafana)
-  hosts: grafana
+  hosts: monitoring
   become: true
   roles:
     - grafana
