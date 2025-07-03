@@ -3,7 +3,7 @@
 set -e
 
 sudo apt-get update
-sudo apt-get install -y python3 python3-pip git
+sudo apt-get install -y python3 python3-pip git unzip
 
 # Supposé être lancé depuis le dossier où release.zip a été copié
 cd /tmp
