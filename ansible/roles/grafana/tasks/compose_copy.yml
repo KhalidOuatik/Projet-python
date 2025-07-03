@@ -1,6 +1,6 @@
 - name: Copier le docker-compose.yml dans /opt/monitoring
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../docker/docker-compose.yml"
+    src: "{{ playbook_dir }}/../docker/monitoring-compose.yml"
     dest: /opt/monitoring/docker-compose.yml
     mode: '0644'
 
