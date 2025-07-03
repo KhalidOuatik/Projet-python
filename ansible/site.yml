@@ -2,15 +2,16 @@
 - name: S'assurer que Python 3.8+ est installé
   hosts: all
   become: true
+  gather_facts: false
   tasks:
     - name: Installer Python 3.8
-      apt:
+      ansible.builtin.apt:
         name: python3.8
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Forcer l'interpréteur Python 3.8 pour Ansible
-      set_fact:
+      ansible.builtin.set_fact:
         ansible_python_interpreter: /usr/bin/python3.8
 
 - name: Provisionnement de base et test de connexion
@@ -25,52 +26,55 @@
   become: true
   tasks:
     - name: Installer les dépendances système
-      apt:
+      ansible.builtin.apt:
         name:
           - apt-transport-https
           - ca-certificates
           - curl
           - software-properties-common
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Ajouter la clé GPG officielle de Docker
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
     - name: Ajouter le dépôt Docker
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
         state: present
 
     - name: Installer Docker
-      apt:
-        name: [docker-ce, docker-ce-cli, containerd.io]
-        state: latest
-        update_cache: yes
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: true
 
     - name: Ajouter l'utilisateur courant au groupe docker
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_user | default('azureuser') }}"
         groups: docker
-        append: yes
+        append: true
 
     - name: Installer Docker Compose
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64
         dest: /usr/local/bin/docker-compose
         mode: '0755'
       register: docker_compose_download
 
     - name: Vérifier la version de Docker Compose
-      command: docker-compose --version
+      ansible.builtin.command: docker-compose --version
       register: compose_version
       changed_when: false
       failed_when: compose_version.rc != 0
 
     - name: Afficher la version de Docker Compose
-      debug:
+      ansible.builtin.debug:
         msg: "Docker Compose version: {{ compose_version.stdout }}"
 
 - name: Déployer l'app Flask (VM app)
