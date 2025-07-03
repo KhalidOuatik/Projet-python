@@ -65,6 +65,11 @@ jobs:
       - name: Add deploy_key.pub to workspace
         run: |
           echo "${{ secrets.DEPLOY_KEY_PUB }}" > deploy_key.pub
+
+      - name: Add deploy_key to workspace
+        run: |
+          echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
+          chmod 600 infra/deploy_key
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
