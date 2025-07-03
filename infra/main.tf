@@ -102,7 +102,7 @@ resource "azurerm_linux_virtual_machine" "app" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("deploy_key.pub")
+    public_key = file("${path.module}/../deploy_key.pub")
   }
 
   os_disk {
@@ -152,7 +152,7 @@ resource "azurerm_linux_virtual_machine" "grafana" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("deploy_key.pub")
+    public_key = file("${path.module}/../deploy_key.pub")
   }
 
   os_disk {
