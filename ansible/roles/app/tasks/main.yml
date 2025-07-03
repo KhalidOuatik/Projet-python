@@ -11,6 +11,13 @@
       - "--exclude=ansible"
       - "--exclude=docker"
 
+- name: Créer le dossier /opt/flask_app sur la VM
+  ansible.builtin.file:
+    path: /opt/flask_app
+    state: directory
+    owner: "{{ ansible_user | default('azureuser') }}"
+    mode: '0755'
+
 - name: Copier le Dockerfile dans le dossier app
   ansible.builtin.copy:
     src: Dockerfile

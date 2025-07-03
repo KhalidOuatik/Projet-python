@@ -1,5 +1,12 @@
 ---
 # Rôle Grafana/Prometheus/node_exporter via docker-compose
+- name: Créer le dossier /opt/monitoring sur la VM
+  ansible.builtin.file:
+    path: /opt/monitoring
+    state: directory
+    owner: "{{ ansible_user | default('azureuser') }}"
+    mode: '0755'
+
 - name: Copier le dossier docker/ sur la VM
   synchronize:
     src: ../../docker/
