@@ -19,10 +19,7 @@
     mode: '0755'
 
 - name: Copier le Dockerfile dans le dossier Flask
-  ansible.builtin.copy:
-    src: roles/app/files/Dockerfile
-    dest: /opt/flask_app/Dockerfile
-    mode: '0644'
+  ansible.builtin.import_tasks: dockerfile_copy.yml
 
 - name: Construire l'image Flask
   community.docker.docker_image:
