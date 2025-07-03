@@ -34,3 +34,15 @@
   community.docker.docker_compose_v2:
     project_src: /opt/monitoring
     state: present
+
+- name: Vérifier que les conteneurs Grafana, Prometheus et node_exporter tournent
+  community.docker.docker_container_info:
+    name: [grafana, prometheus, node_exporter]
+  register: monitoring_containers_info
+
+- name: Afficher l'état des conteneurs Grafana/Prometheus/node_exporter
+  ansible.builtin.debug:
+    msg: |
+      Grafana running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'grafana') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'grafana') | list) else 'absent' }}
+      Prometheus running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'prometheus') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'prometheus') | list) else 'absent' }}
+      node_exporter running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'node_exporter') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'node_exporter') | list) else 'absent' }}

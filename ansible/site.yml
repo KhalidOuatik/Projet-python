@@ -1,5 +1,3 @@
-
-
 ---
 - name: Provisionnement de base et test de connexion
   hosts: all
@@ -64,11 +62,10 @@
       ansible.builtin.debug:
         msg: "Docker Compose version: {{ compose_version.stdout }}"
 
-- name: Déployer l'app Flask (VM app)
   hosts: flask
   become: true
   roles:
-    - app
+    - flask
 
 - name: Déployer Grafana/Prometheus/node_exporter (VM monitoring)
   hosts: monitoring
