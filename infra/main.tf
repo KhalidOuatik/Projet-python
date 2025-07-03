@@ -4,8 +4,8 @@ resource "azurerm_network_interface_security_group_association" "grafana" {
 }
 resource "azurerm_network_security_group" "main" {
   name                = "projet-python-nsg"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = "westeurope"
+  resource_group_name = "projet-python-rg"
 
   security_rule {
     name                       = "SSH"
@@ -44,20 +44,20 @@ provider "azurerm" {
 resource "azurerm_virtual_network" "main" {
   name                = "projet-python-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.main.location
+  location            = "westeurope"
   resource_group_name = "projet-python-rg"
 }
 
 resource "azurerm_subnet" "main" {
   name                 = "projet-python-subnet"
-  resource_group_name  = azurerm_resource_group.main.name
+  resource_group_name  = "projet-python-rg"
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_network_interface" "main" {
   name                = "projet-python-nic"
-  location            = azurerm_resource_group.main.location
+  location            = "westeurope"
   resource_group_name = "projet-python-rg"
 
   ip_configuration {
@@ -70,7 +70,7 @@ resource "azurerm_network_interface" "main" {
 
 resource "azurerm_public_ip" "main" {
   name                = "projet-python-public-ip"
-  location            = azurerm_resource_group.main.location
+  location            = "westeurope"
   resource_group_name = "projet-python-rg"
   allocation_method   = "Static"
 }
@@ -80,7 +80,7 @@ resource "azurerm_public_ip" "main" {
 resource "azurerm_linux_virtual_machine" "app" {
   name                = "projet-python-app-vm"
   resource_group_name = "projet-python-rg"
-  location            = azurerm_resource_group.main.location
+  location            = "westeurope"
   size                = "Standard_B2ms" # 2 vCPU, 8 Go RAM
   admin_username      = "azureuser"
 
@@ -109,15 +109,15 @@ resource "azurerm_linux_virtual_machine" "app" {
 # VM dédiée à Grafana
 resource "azurerm_public_ip" "grafana" {
   name                = "projet-grafana-public-ip"
-  location            = azurerm_resource_group.main.location
+  location            = "westeurope"
   resource_group_name = "projet-python-rg"
   allocation_method   = "Static"
 }
 
 resource "azurerm_network_interface" "grafana" {
   name                = "projet-grafana-nic"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = "westeurope"
+  resource_group_name = "projet-python-rg"
 
   ip_configuration {
     name                          = "internal"
@@ -129,8 +129,8 @@ resource "azurerm_network_interface" "grafana" {
 
 resource "azurerm_linux_virtual_machine" "grafana" {
   name                = "projet-grafana-vm"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  resource_group_name = "projet-python-rg"
+  location            = "westeurope"
   size                = "Standard_B1s"
   admin_username      = "azureuser"
 
