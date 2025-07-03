@@ -177,9 +177,17 @@ jobs:
           pip install ansible[azure]
           ansible-galaxy collection install community.docker
 
-      - name: Déployer l'infra et les services avec Ansible (Docker)
+      - name: Générer dynamiquement l'inventaire Ansible
+        run: |
+          echo "[app]" > ansible/inventory.ini
+          echo "$APP_IP ansible_user=azureuser ansible_ssh_private_key_file=../infra/deploy_key" >> ansible/inventory.ini
+          echo "" >> ansible/inventory.ini
+          echo "[grafana]" >> ansible/inventory.ini
+          echo "$GRAFANA_IP ansible_user=azureuser ansible_ssh_private_key_file=../infra/deploy_key" >> ansible/inventory.ini
         env:
           APP_IP: ${{ env.APP_IP }}
           GRAFANA_IP: ${{ env.GRAFANA_IP }}
+
+      - name: Déployer l'infra et les services avec Ansible (Docker)
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/site.yml

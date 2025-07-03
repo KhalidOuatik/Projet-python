@@ -7,7 +7,7 @@
     rsync_opts:
       - "--exclude=.git"
 
-- name: Lancer le stack docker-compose
-  community.docker.docker_compose:
+- name: Lancer le stack docker-compose (v2)
+  community.docker.docker_compose_v2:
     project_src: /opt/monitoring
     state: present
