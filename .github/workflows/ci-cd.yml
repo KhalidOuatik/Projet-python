@@ -200,10 +200,10 @@ jobs:
       - name: Générer dynamiquement l'inventaire Ansible
         run: |
           echo "[app]" > ansible/inventory.ini
-          echo "$APP_IP ansible_user=azureuser ansible_ssh_private_key_file=../infra/deploy_key ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
+          echo "$APP_IP ansible_user=azureuser ansible_ssh_private_key_file=infra/deploy_key ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
           echo "" >> ansible/inventory.ini
           echo "[grafana]" >> ansible/inventory.ini
-          echo "$GRAFANA_IP ansible_user=azureuser ansible_ssh_private_key_file=../infra/deploy_key ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
+          echo "$GRAFANA_IP ansible_user=azureuser ansible_ssh_private_key_file=infra/deploy_key ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
         env:
           APP_IP: ${{ env.APP_IP }}
           GRAFANA_IP: ${{ env.GRAFANA_IP }}
