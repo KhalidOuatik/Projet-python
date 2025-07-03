@@ -197,13 +197,36 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
           chmod 600 infra/deploy_key
 
+      - name: Vérifier et installer Python 3.8 sur les VMs
+        run: |
+          for ip in "$APP_IP" "$GRAFANA_IP"; do
+            echo "Connexion à $ip"
+            ssh -o StrictHostKeyChecking=no -i infra/deploy_key azureuser@$ip '
+              if [ -x /usr/bin/python3.8 ]; then
+                echo "Python 3.8 déjà installé"
+              else
+                echo "Installation de Python 3.8"
+                sudo apt-get update
+                sudo apt-get install -y software-properties-common
+                sudo add-apt-repository -y ppa:deadsnakes/ppa
+                sudo apt-get update
+                sudo apt-get install -y python3.8
+              fi
+              ls -l /usr/bin/python3.8
+              /usr/bin/python3.8 --version
+            '
+          done
+        env:
+          APP_IP: ${{ env.APP_IP }}
+          GRAFANA_IP: ${{ env.GRAFANA_IP }}
+
       - name: Générer dynamiquement l'inventaire Ansible
         run: |
-          echo "[app]" > ansible/inventory.ini
-          echo "$APP_IP ansible_user=azureuser ansible_ssh_private_key_file=infra/deploy_key ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
+          echo "[flask]" > ansible/inventory.ini
+          echo "app ansible_host=$APP_IP ansible_user=azureuser ansible_ssh_private_key_file=infra/deploy_key ansible_python_interpreter=/usr/bin/python3.8 ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
           echo "" >> ansible/inventory.ini
           echo "[grafana]" >> ansible/inventory.ini
-          echo "$GRAFANA_IP ansible_user=azureuser ansible_ssh_private_key_file=infra/deploy_key ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
+          echo "grafana ansible_host=$GRAFANA_IP ansible_user=azureuser ansible_ssh_private_key_file=infra/deploy_key ansible_python_interpreter=/usr/bin/python3.8 ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
         env:
           APP_IP: ${{ env.APP_IP }}
           GRAFANA_IP: ${{ env.GRAFANA_IP }}
