@@ -195,6 +195,12 @@ jobs:
           pip install ansible[azure]
           ansible-galaxy collection install community.docker
 
+      - name: Ensure deploy_key exists for Ansible
+        run: |
+          mkdir -p infra
+          echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
+          chmod 600 infra/deploy_key
+
       - name: Générer dynamiquement l'inventaire Ansible
         run: |
           echo "[app]" > ansible/inventory.ini
