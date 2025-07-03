@@ -1,10 +1,12 @@
 
 name: Build and deploy Python app to Azure Web App - python-projet
 
+
 on:
   push:
     branches:
       - main
+      - infra-test
   workflow_dispatch:
 
   # Empêche le job de déploiement de tourner sur la branche infra-test
