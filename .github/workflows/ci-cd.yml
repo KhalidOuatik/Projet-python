@@ -1,4 +1,3 @@
-
 name: Build and deploy Python app to Azure Web App - python-projet
 
 
@@ -86,6 +85,20 @@ jobs:
 
       - name: Init Terraform
         run: terraform -chdir=infra init
+
+      - name: Import ressources Azure existantes (idempotent)
+        run: |
+          set -e
+          SUBSCRIPTION_ID="${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}"
+          # Import NSG
+          terraform -chdir=infra import azurerm_network_security_group.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
+          # Import VNet
+          terraform -chdir=infra import azurerm_virtual_network.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet" || true
+          # Import IP publique principale
+          terraform -chdir=infra import azurerm_public_ip.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-python-public-ip" || true
+          # Import IP publique Grafana
+          terraform -chdir=infra import azurerm_public_ip.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-grafana-public-ip" || true
+        shell: bash
 
       - name: Apply Terraform (création/MAJ des VMs)
         run: terraform -chdir=infra apply -auto-approve
