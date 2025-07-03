@@ -7,22 +7,14 @@ on:
     branches:
       - main
       - infra-test
-  workflow_dispatch:
 
-  # Empêche le job de déploiement de tourner sur la branche infra-test
-  # (le job "deploy" ne sera déclenché que sur main)
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set Azure credentials
-      run: |
-        echo "ARM_CLIENT_ID=${{ secrets.AZUREAPPSERVICE_CLIENTID }}" >> $GITHUB_ENV
-        echo "ARM_CLIENT_SECRET=${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}" >> $GITHUB_ENV
-        echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}" >> $GITHUB_ENV
-        echo "ARM_TENANT_ID=${{ secrets.AZUREAPPSERVICE_TENANTID }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
 
       - name: Set up Python version
@@ -53,10 +45,6 @@ jobs:
           path: |
             release.zip
             !venv/
-
-
-
-  deploy:
 
   deploy:
     needs: build
