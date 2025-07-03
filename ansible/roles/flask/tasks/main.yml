@@ -34,10 +34,11 @@
 
 - name: Construire l'image Flask
   community.docker.docker_image:
-    build:
-      path: /opt/flask_app
     name: flask-app
     tag: latest
+    build:
+      path: /opt/flask_app
+    source: build
 
 - name: Lancer le conteneur Flask
   community.docker.docker_container:
