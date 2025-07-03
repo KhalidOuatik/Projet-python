@@ -37,7 +37,7 @@ jobs:
           python -m unittest discover
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip -r release.zip . -x "venv/*"
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -64,13 +64,15 @@ jobs:
 
       - name: Add deploy_key.pub to workspace
         run: |
-          echo "${{ secrets.DEPLOY_KEY_PUB }}" > deploy_key.pub
+          mkdir -p infra
+          echo "${{ secrets.DEPLOY_KEY_PUB }}" > infra/deploy_key.pub
 
       - name: Add deploy_key to workspace
         run: |
           mkdir -p infra
           echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
           chmod 600 infra/deploy_key
+
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
