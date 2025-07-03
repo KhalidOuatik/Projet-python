@@ -1,5 +1,7 @@
 ---
 - name: Provisionnement de base et test de connexion
+
+- name: Provisionnement de base et test de connexion
   hosts: all
   become: true
   tasks:
@@ -62,6 +64,7 @@
       ansible.builtin.debug:
         msg: "Docker Compose version: {{ compose_version.stdout }}"
 
+- name: Déployer Flask (VM app)
   hosts: flask
   become: true
   roles:

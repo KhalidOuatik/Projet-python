@@ -1,5 +1,0 @@
-- name: Copier le Dockerfile racine dans le dossier Flask
-  ansible.builtin.copy:
-    src: ../../../../Dockerfile
-    dest: /opt/flask_app/Dockerfile
-    mode: '0644'
