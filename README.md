@@ -1,85 +1,94 @@
-# Health Calculator Microservice
 
-Ce projet est un microservice Python qui calcule l'IMC (Indice de Masse Corporelle) et le BMR (Taux Métabolique de Base) via une API REST. Il est conteneurisé avec Docker et déployé sur Azure App Service via un pipeline CI/CD GitHub Actions.
+# Projet DevOps Python – Stack Azure, Docker, Ansible, Monitoring & CI/CD
 
-## Prérequis
+## Présentation
+Ce projet déploie automatiquement une stack applicative Python (Flask) monitorée (Prometheus, Grafana, node_exporter) sur Azure, avec infrastructure as code (Terraform), déploiement automatisé (Ansible, Docker), pipeline CI/CD GitHub Actions robuste, et tests d’intégration automatisés.
 
-- Python 3.11+
-- pip
-- Git
-- Compte GitHub (pour le fork et le déploiement)
-- Compte Azure (pour le déploiement)
+---
 
-## Installation et Configuration Locale
+## Fonctionnalités principales
+- **Infrastructure Azure** :
+  - Provisionnement de 2 VMs (Flask + Monitoring) via Terraform
+  - NSG, IPs publiques, VNet, Subnet, clés SSH
+- **Déploiement applicatif** :
+  - Dockerisation complète (Flask, Prometheus, Grafana, node_exporter)
+  - Déploiement automatisé via Ansible (playbooks, rôles, inventaire dynamique)
+  - Monitoring Prometheus/node_exporter, dashboard Grafana
+  - Endpoint `/metrics` exposé par Flask, scrappé par Prometheus
+- **CI/CD GitHub Actions** :
+  - Build, tests unitaires, artefacts, déploiement infra/app, tests d’intégration
+  - Génération dynamique de l’inventaire Ansible avec IPs et clés
+  - Destruction/recréation idempotente de l’infra Azure
+  - Vérification automatique de la présence des conteneurs sur les VMs
+- **Tests d’intégration** :
+  - Script Python (`integration_test.py`) pour tester Flask, Grafana, Prometheus
+  - Logs détaillés, attente de services, vérification HTTP
+- **Qualité de code** :
+  - Analyse SonarQube Cloud (sécurité, fiabilité, maintenabilité, duplications)
+  - Couverture de tests Python intégrée (coverage)
 
-1. Clonez ce dépôt :
+---
 
-   git clone https://github.com/votre-username/Projet-python.git
-   cd Projet-python
+## Stack technique
+- **Cloud** : Azure (VMs Ubuntu 20.04)
+- **IaC** : Terraform
+- **Déploiement** : Ansible, Docker, Docker Compose
+- **App** : Python 3.9+, Flask, prometheus_flask_exporter
+- **Monitoring** : Prometheus, Grafana, node_exporter
+- **CI/CD** : GitHub Actions
+- **Qualité** : SonarQube Cloud (SonarCloud)
 
+---
 
-2. Créez et activez un environnement virtuel :
+## Pipeline CI/CD (GitHub Actions)
+1. **Build**
+   - Install Python, dépendances, tests unitaires
+   - Génère l’artefact zip pour déploiement
+   - Analyse SonarQube (qualité + couverture)
+2. **Deploy**
+   - Déploie l’infra Azure (import/destroy/apply)
+   - Génère l’inventaire Ansible dynamique
+   - Déploie les services via Ansible/Docker
+   - Lance les tests d’intégration
 
-   python -m venv venv
-   source venv/bin/activate  # Sur Windows, utilisez venv\Scripts\activate
+---
 
+## Lancer une analyse SonarQube Cloud
+1. Créer un compte sur https://sonarcloud.io/ et lier le repo GitHub
+2. Générer un token d’analyse et l’ajouter dans les secrets GitHub (`SONAR_TOKEN`)
+3. Le pipeline CI/CD lance automatiquement l’analyse à chaque push
+4. Résultats visibles sur SonarCloud (qualité, bugs, duplications, couverture)
 
-3. Installez les dépendances :
+---
 
-   pip install -r requirements.txt
+## Badge SonarQube
+Ajoute ce badge dans le README (remplace les valeurs par ton projet) :
 
+```
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-orange.svg)](https://sonarcloud.io/summary/new_code?id=Projet-python)
+```
 
-## Exécution Locale
+---
 
-1. Lancez l'application :
+## Lancer les tests d’intégration manuellement
+```bash
+pip install -r requirements.txt
+python3 integration_test.py
+```
 
-   python app.py
+---
 
+## Structure du projet
+- `app.py` : Application Flask
+- `integration_test.py` : Tests d’intégration
+- `Dockerfile` : Build Flask (Gunicorn)
+- `docker/docker-compose.yml` : Stack monitoring
+- `ansible/` : Playbooks, rôles, inventaire
+- `infra/` : Fichiers Terraform
+- `.github/workflows/ci-cd.yml` : Pipeline CI/CD
+- `sonar-project.properties` : Config SonarQube
 
-2. L'application sera accessible à l'adresse `http://localhost:5000`
+---
 
-3. Testez les endpoints avec curl ou un outil similaire :
-
-   curl -X POST -H "Content-Type: application/json" -d '{"height": 1.75, "weight": 70}' http://localhost:5000/bmi
-   curl -X POST -H "Content-Type: application/json" -d '{"height": 175, "weight": 70, "age": 25, "gender": "male"}' http://localhost:5000/bmr
-
-
-## Exécution des Tests
-
-Pour exécuter les tests unitaires :
-
-python -m unittest discover
-
-
-## Déploiement sur Azure
-
-Le déploiement est automatisé via GitHub Actions. Pour configurer le déploiement sur votre propre environnement Azure :
-
-1. Forkez ce dépôt sur votre compte GitHub.
-
-2. Créez une Web App sur Azure :
-   - Allez sur le portail Azure et créez une nouvelle Web App.
-   - Notez le nom de votre App Service.
-
-3. Configurez les secrets GitHub :
-   - Dans votre fork GitHub, allez dans Settings > Secrets and variables > Actions.
-   - Ajoutez les secrets suivants :
-     - `AZUREAPPSERVICE_CLIENTID`
-     - `AZUREAPPSERVICE_TENANTID`
-     - `AZUREAPPSERVICE_SUBSCRIPTIONID`
-   (Vous pouvez obtenir ces valeurs depuis le portail Azure)
-
-4. Mettez à jour le fichier `.github/workflows/ci-cd.yml` :
-   - Remplacez `'python-projet'` par le nom de votre App Service Azure.
-
-5. Poussez un changement sur la branche main pour déclencher le déploiement.
-
-## Structure du Projet
-
-- `app.py`: Point d'entrée de l'application Flask.
-- `health_utils.py`: Fonctions utilitaires pour les calculs de santé.
-- `test.py`: Tests unitaires.
-- `requirements.txt`: Dépendances du projet.
-- `.github/workflows/ci-cd.yml`: Configuration du workflow GitHub Actions.
-
-Projet réalisé par Khalid OUATIK pour un projet Python/Azure
+## Auteur
+Projet DevOps complet – automatisé, monitoré, testé, industrialisé par Khalid OUATIK
