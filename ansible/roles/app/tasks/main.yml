@@ -10,6 +10,7 @@
       - "--exclude=__pycache__"
       - "--exclude=ansible"
       - "--exclude=docker"
+      - "--exclude=Dockerfile"
 
 - name: Créer le dossier /opt/flask_app sur la VM
   ansible.builtin.file:

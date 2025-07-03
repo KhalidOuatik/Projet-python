@@ -13,6 +13,7 @@
     dest: /opt/monitoring/
     rsync_opts:
       - "--exclude=.git"
+      - "--exclude=Dockerfile"
 
 - name: Copier les fichiers docker-compose et prometheus.yml
   ansible.builtin.import_tasks: compose_copy.yml
