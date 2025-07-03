@@ -1,3 +1,4 @@
+
 name: Build and deploy Python app to Azure Web App - python-projet
 
 on:
@@ -5,6 +6,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+
+  # Empêche le job de déploiement de tourner sur la branche infra-test
+  # (le job "deploy" ne sera déclenché que sur main)
 
 jobs:
   build:
@@ -43,6 +47,7 @@ jobs:
             !venv/
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -60,16 +65,46 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_17CEA9DE144D4771973BFBBB6BE651AA }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0AB702E3168A4BF493557427C9B4802E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_72B90A8BD62F49C6AB3FDD9886D46B54 }}
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_KEY: ${{ secrets.SECRET_SSH_KEY }}
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          app-name: 'python-projet'
-          slot-name: 'Production'
+          terraform_version: 1.7.5
+
+      - name: Init Terraform
+        run: terraform -chdir=infra init
+
+      - name: Apply Terraform (création/MAJ des VMs)
+        run: terraform -chdir=infra apply -auto-approve
+
+      - name: Get App VM public IP
+        id: get_ip
+        run: |
+          APP_IP=$(terraform -chdir=infra output -raw app_public_ip_address)
+          GRAFANA_IP=$(terraform -chdir=infra output -raw grafana_public_ip_address)
+          echo "APP_IP=$APP_IP" >> $GITHUB_ENV
+          echo "GRAFANA_IP=$GRAFANA_IP" >> $GITHUB_ENV
+
+      - name: Copy Flask install script and app to VM
+        run: |
+          scp -o StrictHostKeyChecking=no infra/install_flask.sh azureuser@$APP_IP:/tmp/
+          scp -o StrictHostKeyChecking=no release.zip azureuser@$APP_IP:/tmp/
+
+      - name: Install Flask app on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@$APP_IP 'bash /tmp/install_flask.sh'
+
+      - name: Copy Grafana install script to VM
+        run: |
+          scp -o StrictHostKeyChecking=no infra/install_grafana.sh azureuser@$GRAFANA_IP:/tmp/
+
+      - name: Install Grafana on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_grafana.sh'
