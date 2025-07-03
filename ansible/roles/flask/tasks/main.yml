@@ -24,6 +24,14 @@
     dest: /opt/flask_app/Dockerfile
     mode: '0644'
 
+- name: Lister le contenu de /opt/flask_app
+  ansible.builtin.shell: ls -l /opt/flask_app
+  register: flask_app_ls
+
+- name: Afficher le contenu de /opt/flask_app
+  ansible.builtin.debug:
+    var: flask_app_ls.stdout_lines
+
 - name: Construire l'image Flask
   community.docker.docker_image:
     build:
