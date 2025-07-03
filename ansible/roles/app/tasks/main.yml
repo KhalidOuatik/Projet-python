@@ -23,7 +23,6 @@
     src: Dockerfile
     dest: /opt/flask_app/Dockerfile
     mode: '0644'
-  delegate_to: localhost
 
 - name: Construire l'image Flask
   community.docker.docker_image:
