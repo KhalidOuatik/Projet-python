@@ -60,6 +60,9 @@ jobs:
         with:
           name: python-app
 
+      - name: Add deploy_key.pub to workspace
+        run: |
+          echo "${{ secrets.DEPLOY_KEY_PUB }}" > deploy_key.pub
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
