@@ -2,7 +2,7 @@
 # Rôle Flask : build et run le conteneur Flask
 - name: Copier le code Flask sur la VM
   synchronize:
-    src: ../../..
+    src: "{{ playbook_dir }}/.."
     dest: /opt/flask_app
     rsync_opts:
       - "--exclude=.git"
