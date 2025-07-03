@@ -273,4 +273,4 @@ jobs:
           GRAFANA_IP: ${{ env.GRAFANA_IP }}
           PROMETHEUS_IP: ${{ env.GRAFANA_IP }}
         run: |
-          python3 test_integration.py
+          python3 integration_test.py
