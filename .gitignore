@@ -2,3 +2,10 @@
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
+
+# Fichiers d'état Terraform spécifiques au dossier infra
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+
+# Optionnel : ignorer aussi les plans Terraform
+*.tfplan
