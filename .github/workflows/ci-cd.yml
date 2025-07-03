@@ -62,17 +62,7 @@ jobs:
         with:
           name: python-app
 
-      - name: Add deploy_key.pub to workspace
-        run: |
-          mkdir -p infra
-          echo "${{ secrets.DEPLOY_KEY_PUB }}" > infra/deploy_key.pub
-
-      - name: Add deploy_key to workspace
-        run: |
-          mkdir -p infra
-          echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
-          chmod 600 infra/deploy_key
-
+      # Suppression de la création des clés ici (elles sont créées avant Terraform seulement)
       - name: Unzip artifact for deployment
         run: unzip -o -qq release.zip
 
