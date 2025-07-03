@@ -69,7 +69,7 @@
     - flask
 
 - name: Déployer Grafana/Prometheus/node_exporter (VM monitoring)
-  hosts: monitoring_host
+  hosts: monitoring
   become: true
   roles:
     - grafana
