@@ -92,11 +92,7 @@ jobs:
           mkdir -p infra
           echo "${{ secrets.DEPLOY_KEY_PUB }}" > infra/deploy_key.pub
 
-      - name: Add deploy_key to workspace (avant Terraform)
-        run: |
-          mkdir -p infra
-          echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
-          chmod 600 infra/deploy_key
+      # Suppression de la création de la clé privée ici (inutile pour Terraform)
 
       - name: Init Terraform
         run: terraform -chdir=infra init
@@ -211,6 +207,12 @@ jobs:
         env:
           APP_IP: ${{ env.APP_IP }}
           GRAFANA_IP: ${{ env.GRAFANA_IP }}
+
+      - name: Ensure deploy_key exists for Ansible
+        run: |
+          mkdir -p infra
+          echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
+          chmod 600 infra/deploy_key
 
       - name: Déployer l'infra et les services avec Ansible (Docker)
         run: |
