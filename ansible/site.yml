@@ -1,7 +1,5 @@
 ---
 - name: Provisionnement de base et test de connexion
-
-- name: Provisionnement de base et test de connexion
   hosts: all
   become: true
   tasks:
