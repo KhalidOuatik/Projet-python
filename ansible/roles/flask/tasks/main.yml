@@ -18,7 +18,11 @@
     owner: "{{ ansible_user | default('azureuser') }}"
     mode: '0755'
 
-
+- name: Copier le Dockerfile racine dans le dossier Flask
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../Dockerfile"
+    dest: /opt/flask_app/Dockerfile
+    mode: '0644'
 
 - name: Construire l'image Flask
   community.docker.docker_image:
