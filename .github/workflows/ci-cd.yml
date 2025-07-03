@@ -134,6 +134,9 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
           ARM_TENANT_ID: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
 
+      - name: Pause pour libération des ressources Azure
+        run: sleep 60
+
       - name: Apply Terraform (création/MAJ des VMs)
         run: terraform -chdir=infra apply -auto-approve
 
@@ -253,3 +256,10 @@ jobs:
           PROMETHEUS_IP: ${{ env.GRAFANA_IP }}
         run: |
           python3 integration_test.py
+
+      - name: Analyse Greenframe (empreinte carbone)
+        run: |
+          npm install -g @greenframe/cli
+          greenframe analyze http://$APP_IP:5000 || true
+        env:
+          APP_IP: ${{ env.APP_IP }}
