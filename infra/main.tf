@@ -3,6 +3,29 @@ resource "azurerm_network_interface_security_group_association" "grafana" {
   network_security_group_id = azurerm_network_security_group.main.id
 }
 resource "azurerm_network_security_group" "main" {
+  security_rule {
+    name                       = "Prometheus"
+    priority                   = 1004
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "9090"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "NodeExporter"
+    priority                   = 1005
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "9100"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
   name                = "projet-python-nsg"
   location            = "westeurope"
   resource_group_name = "projet-python-rg"
