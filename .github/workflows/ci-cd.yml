@@ -68,6 +68,7 @@ jobs:
 
       - name: Add deploy_key to workspace
         run: |
+          mkdir -p infra
           echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
           chmod 600 infra/deploy_key
       - name: Unzip artifact for deployment
