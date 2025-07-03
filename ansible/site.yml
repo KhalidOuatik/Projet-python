@@ -1,19 +1,6 @@
+
+
 ---
-- name: S'assurer que Python 3.8+ est installé
-  hosts: all
-  become: true
-  gather_facts: false
-  tasks:
-    - name: Installer Python 3.8
-      ansible.builtin.apt:
-        name: python3.8
-        state: present
-        update_cache: true
-
-    - name: Forcer l'interpréteur Python 3.8 pour Ansible
-      ansible.builtin.set_fact:
-        ansible_python_interpreter: /usr/bin/python3.8
-
 - name: Provisionnement de base et test de connexion
   hosts: all
   become: true
