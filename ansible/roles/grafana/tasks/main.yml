@@ -14,21 +14,6 @@
     rsync_opts:
       - "--exclude=.git"
 
-- name: Copier tout le dossier docker/ (fichiers essentiels uniquement) sur la VM
-  ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../../docker/"
-    dest: /opt/monitoring/
-    mode: '0644'
-    directory_mode: '0755'
-    remote_src: false
-    exclude:
-      - .git
-      - __pycache__
-      - '*.md'
-      - '*.yml'
-      - '*.yaml'
-      - '*.ini'
-      - '*.zip'
 
 - name: Lancer le stack docker-compose (v2)
   community.docker.docker_compose_v2:
