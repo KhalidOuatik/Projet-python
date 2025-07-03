@@ -100,6 +100,14 @@ jobs:
           terraform -chdir=infra import azurerm_network_interface.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-python-nic" || true
           # Import NIC Grafana
           terraform -chdir=infra import azurerm_network_interface.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-grafana-nic" || true
+          # Import association NSG <-> NIC principale
+          terraform -chdir=infra import azurerm_network_interface_security_group_association.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-python-nic|/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
+          # Import association NSG <-> NIC Grafana
+          terraform -chdir=infra import azurerm_network_interface_security_group_association.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-grafana-nic|/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
+          # Import VM Flask
+          terraform -chdir=infra import azurerm_linux_virtual_machine.app "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Compute/virtualMachines/projet-python-app-vm" || true
+          # Import VM Grafana
+          terraform -chdir=infra import azurerm_linux_virtual_machine.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Compute/virtualMachines/projet-grafana-vm" || true
           # Import IP publique principale
           terraform -chdir=infra import azurerm_public_ip.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-python-public-ip" || true
           # Import IP publique Grafana
