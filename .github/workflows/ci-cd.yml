@@ -1,11 +1,13 @@
 name: Build and deploy Python app to Azure Web App - python-projet
 
 
+
 on:
   push:
     branches:
       - main
       - infra-test
+      - ansible-docker
 
   workflow_dispatch:
 
