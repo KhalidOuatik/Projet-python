@@ -12,9 +12,11 @@
       - "--exclude=docker"
 
 - name: Copier le Dockerfile dans le dossier app
-  copy:
-    src: ../../docker/Dockerfile
+  ansible.builtin.copy:
+    src: Dockerfile
     dest: /opt/flask_app/Dockerfile
+    mode: '0644'
+  delegate_to: localhost
 
 - name: Construire l'image Flask
   community.docker.docker_image:
