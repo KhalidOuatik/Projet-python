@@ -263,3 +263,14 @@ jobs:
       - name: Déployer l'infra et les services avec Ansible (Docker)
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/site.yml
+
+      - name: Install integration test dependencies
+        run: pip install requests
+
+      - name: Run integration tests
+        env:
+          FLASK_IP: ${{ env.APP_IP }}
+          GRAFANA_IP: ${{ env.GRAFANA_IP }}
+          PROMETHEUS_IP: ${{ env.GRAFANA_IP }}
+        run: |
+          python3 test_integration.py
