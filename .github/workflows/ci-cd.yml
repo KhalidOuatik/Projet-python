@@ -152,3 +152,17 @@ jobs:
       - name: Install Prometheus + node_exporter on VM Grafana
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_prometheus.sh'
+
+      - name: Générer le bloc Prometheus pour Flask
+        run: |
+          echo "  - job_name: \"flask_app\"" > flask_target.yml
+          echo "    static_configs:" >> flask_target.yml
+          echo "      - targets: [\"$APP_IP:5000\"]" >> flask_target.yml
+
+      - name: Injecter la cible Flask dans prometheus.yml sur la VM Grafana
+        run: |
+          scp -o StrictHostKeyChecking=no flask_target.yml azureuser@$GRAFANA_IP:/tmp/
+          ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP '
+            sudo sed -i "/scrape_configs:/r /tmp/flask_target.yml" /opt/prometheus/prometheus.yml
+            sudo systemctl restart prometheus
+          '

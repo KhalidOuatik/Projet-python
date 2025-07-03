@@ -1,0 +1,4 @@
+# Template Prometheus scrape config pour Flask
+- job_name: 'flask_app'
+  static_configs:
+    - targets: ['REPLACE_FLASK_IP:5000']

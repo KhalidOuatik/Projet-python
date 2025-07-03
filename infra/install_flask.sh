@@ -14,5 +14,8 @@ cd /tmp
 unzip -o release.zip
 pip3 install -r requirements.txt
 
+# Installer prometheus_flask_exporter pour l'export des métriques
+pip3 install prometheus_flask_exporter
+
 # Lancer l'app Flask en mode production avec gunicorn
 nohup gunicorn -b 0.0.0.0:5000 app:app &

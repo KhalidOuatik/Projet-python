@@ -1,9 +1,12 @@
+
 from flask import Flask, request, jsonify, render_template
 from health_utils import calculate_bmi, calculate_bmr
 import logging
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
+metrics = PrometheusMetrics(app)
 
 @app.route('/')
 def home():
@@ -39,6 +42,7 @@ def bmr():
         app.logger.error(f"Error calculating BMR: {str(e)}")
         return jsonify({"error": "Une erreur est survenue lors du calcul du BMR."}), 500
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
 
