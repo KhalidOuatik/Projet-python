@@ -74,7 +74,7 @@ jobs:
           chmod 600 infra/deploy_key
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip
+        run: unzip -o -qq release.zip
 
       - name: Set Azure credentials
         run: |
