@@ -99,6 +99,14 @@ jobs:
       - name: Init Terraform
         run: terraform -chdir=infra init
 
+      - name: Destroy existing Azure infra (optionnel)
+        run: terraform -chdir=infra destroy -auto-approve || true
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          ARM_TENANT_ID: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+
       - name: Import ressources Azure existantes (idempotent)
         run: |
           set -e
