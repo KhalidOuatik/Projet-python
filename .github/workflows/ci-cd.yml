@@ -94,16 +94,9 @@ jobs:
 
       # Suppression de la création de la clé privée ici (inutile pour Terraform)
 
+
       - name: Init Terraform
         run: terraform -chdir=infra init
-
-      - name: Destroy existing Azure infra (optionnel)
-        run: terraform -chdir=infra destroy -auto-approve || true
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
-          ARM_TENANT_ID: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
 
       - name: Import ressources Azure existantes (idempotent)
         run: |
@@ -132,6 +125,14 @@ jobs:
           # Import IP publique Grafana
           terraform -chdir=infra import azurerm_public_ip.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-grafana-public-ip" || true
         shell: bash
+
+      - name: Destroy existing Azure infra (optionnel)
+        run: terraform -chdir=infra destroy -auto-approve || true
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          ARM_TENANT_ID: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
 
       - name: Apply Terraform (création/MAJ des VMs)
         run: terraform -chdir=infra apply -auto-approve
