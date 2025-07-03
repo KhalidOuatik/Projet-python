@@ -91,10 +91,22 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SECRET_SSH_KEY }}
 
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
+
+      - name: Add deploy_key.pub to workspace (avant Terraform)
+        run: |
+          mkdir -p infra
+          echo "${{ secrets.DEPLOY_KEY_PUB }}" > infra/deploy_key.pub
+
+      - name: Add deploy_key to workspace (avant Terraform)
+        run: |
+          mkdir -p infra
+          echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
+          chmod 600 infra/deploy_key
 
       - name: Init Terraform
         run: terraform -chdir=infra init
