@@ -144,3 +144,11 @@ jobs:
       - name: Install Grafana on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_grafana.sh'
+
+      - name: Copy Prometheus install script to VM Grafana
+        run: |
+          scp -o StrictHostKeyChecking=no infra/install_prometheus.sh azureuser@$GRAFANA_IP:/tmp/
+
+      - name: Install Prometheus + node_exporter on VM Grafana
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_prometheus.sh'
