@@ -30,7 +30,11 @@
 
 - name: Afficher l'état des conteneurs Grafana/Prometheus/node_exporter
   ansible.builtin.debug:
-    msg: |
-      Grafana running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'grafana') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'grafana') | list) else 'absent' }}
-      Prometheus running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'prometheus') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'prometheus') | list) else 'absent' }}
-      node_exporter running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'node_exporter') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'node_exporter') | list) else 'absent' }}
+    msg: >-
+      {% if monitoring_containers_info is defined and monitoring_containers_info.containers is defined and monitoring_containers_info.containers | length > 0 %}
+        Grafana running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'grafana') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'grafana') | list) else 'absent' }}
+        Prometheus running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'prometheus') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'prometheus') | list) else 'absent' }}
+        node_exporter running: {{ (monitoring_containers_info.containers | selectattr('Name', 'search', 'node_exporter') | list)[0].State.Running if (monitoring_containers_info.containers | selectattr('Name', 'search', 'node_exporter') | list) else 'absent' }}
+      {% else %}
+        Aucun conteneur monitoring trouvé ou variable non définie
+      {% endif %}
