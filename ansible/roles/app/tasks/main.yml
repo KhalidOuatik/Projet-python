@@ -1,0 +1,33 @@
+---
+# Rôle App Flask : build et run le conteneur Flask
+- name: Copier le code Flask sur la VM
+  synchronize:
+    src: ../../..
+    dest: /opt/flask_app
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=venv"
+      - "--exclude=__pycache__"
+      - "--exclude=ansible"
+      - "--exclude=docker"
+
+- name: Copier le Dockerfile dans le dossier app
+  copy:
+    src: ../../docker/Dockerfile
+    dest: /opt/flask_app/Dockerfile
+
+- name: Construire l'image Flask
+  community.docker.docker_image:
+    build:
+      path: /opt/flask_app
+    name: flask-app
+    tag: latest
+
+- name: Lancer le conteneur Flask
+  community.docker.docker_container:
+    name: flask
+    image: flask-app:latest
+    state: started
+    restart_policy: always
+    published_ports:
+      - "5000:5000"

@@ -128,41 +128,55 @@ jobs:
           echo "APP_IP=$APP_IP" >> $GITHUB_ENV
           echo "GRAFANA_IP=$GRAFANA_IP" >> $GITHUB_ENV
 
-      - name: Copy Flask install script and app to VM
-        run: |
-          scp -o StrictHostKeyChecking=no infra/install_flask.sh azureuser@$APP_IP:/tmp/
-          scp -o StrictHostKeyChecking=no release.zip azureuser@$APP_IP:/tmp/
+      # --- Anciennes étapes de déploiement manuel (désormais gérées par Ansible/Docker) ---
+      # - name: Copy Flask install script and app to VM
+      #   run: |
+      #     scp -o StrictHostKeyChecking=no infra/install_flask.sh azureuser@$APP_IP:/tmp/
+      #     scp -o StrictHostKeyChecking=no release.zip azureuser@$APP_IP:/tmp/
 
-      - name: Install Flask app on VM
-        run: |
-          ssh -o StrictHostKeyChecking=no azureuser@$APP_IP 'bash /tmp/install_flask.sh'
+      # - name: Install Flask app on VM
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@$APP_IP 'bash /tmp/install_flask.sh'
 
-      - name: Copy Grafana install script to VM
-        run: |
-          scp -o StrictHostKeyChecking=no infra/install_grafana.sh azureuser@$GRAFANA_IP:/tmp/
+      # - name: Copy Grafana install script to VM
+      #   run: |
+      #     scp -o StrictHostKeyChecking=no infra/install_grafana.sh azureuser@$GRAFANA_IP:/tmp/
 
-      - name: Install Grafana on VM
-        run: |
-          ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_grafana.sh'
+      # - name: Install Grafana on VM
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_grafana.sh'
 
-      - name: Copy Prometheus install script to VM Grafana
-        run: |
-          scp -o StrictHostKeyChecking=no infra/install_prometheus.sh azureuser@$GRAFANA_IP:/tmp/
+      # - name: Copy Prometheus install script to VM Grafana
+      #   run: |
+      #     scp -o StrictHostKeyChecking=no infra/install_prometheus.sh azureuser@$GRAFANA_IP:/tmp/
 
-      - name: Install Prometheus + node_exporter on VM Grafana
-        run: |
-          ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_prometheus.sh'
+      # - name: Install Prometheus + node_exporter on VM Grafana
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_prometheus.sh'
 
-      - name: Générer le bloc Prometheus pour Flask
-        run: |
-          echo "  - job_name: \"flask_app\"" > flask_target.yml
-          echo "    static_configs:" >> flask_target.yml
-          echo "      - targets: [\"$APP_IP:5000\"]" >> flask_target.yml
+      # - name: Générer le bloc Prometheus pour Flask
+      #   run: |
+      #     echo "  - job_name: \"flask_app\"" > flask_target.yml
+      #     echo "    static_configs:" >> flask_target.yml
+      #     echo "      - targets: [\"$APP_IP:5000\"]" >> flask_target.yml
 
-      - name: Injecter la cible Flask dans prometheus.yml sur la VM Grafana
+      # - name: Injecter la cible Flask dans prometheus.yml sur la VM Grafana
+      #   run: |
+      #     scp -o StrictHostKeyChecking=no flask_target.yml azureuser@$GRAFANA_IP:/tmp/
+      #     ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP '
+      #       sudo sed -i "/scrape_configs:/r /tmp/flask_target.yml" /opt/prometheus/prometheus.yml
+      #       sudo systemctl restart prometheus
+      #     '
+
+      - name: Installer Ansible
         run: |
-          scp -o StrictHostKeyChecking=no flask_target.yml azureuser@$GRAFANA_IP:/tmp/
-          ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP '
-            sudo sed -i "/scrape_configs:/r /tmp/flask_target.yml" /opt/prometheus/prometheus.yml
-            sudo systemctl restart prometheus
-          '
+          sudo apt-get update
+          sudo apt-get install -y ansible
+          pip install ansible[azure] community.docker
+
+      - name: Déployer l'infra et les services avec Ansible (Docker)
+        env:
+          APP_IP: ${{ env.APP_IP }}
+          GRAFANA_IP: ${{ env.GRAFANA_IP }}
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/site.yml

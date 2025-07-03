@@ -1,0 +1,13 @@
+---
+# Rôle Grafana/Prometheus/node_exporter via docker-compose
+- name: Copier le dossier docker/ sur la VM
+  synchronize:
+    src: ../../docker/
+    dest: /opt/monitoring/
+    rsync_opts:
+      - "--exclude=.git"
+
+- name: Lancer le stack docker-compose
+  community.docker.docker_compose:
+    project_src: /opt/monitoring
+    state: present
