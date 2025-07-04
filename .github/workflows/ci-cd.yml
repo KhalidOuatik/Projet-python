@@ -121,45 +121,45 @@ jobs:
 
       - name: Add deploy_key.pub to workspace (avant Terraform)
         run: |
-          mkdir -p infra
-          echo "${{ secrets.DEPLOY_KEY_PUB }}" > infra/deploy_key.pub
+          mkdir -p infra/terraform
+          echo "${{ secrets.DEPLOY_KEY_PUB }}" > infra/terraform/deploy_key.pub
 
       # Suppression de la création de la clé privée ici (inutile pour Terraform)
 
 
       - name: Init Terraform
-        run: terraform -chdir=infra init
+        run: terraform -chdir=infra/terraform init
 
       - name: Import ressources Azure existantes (idempotent)
         run: |
           set -e
           SUBSCRIPTION_ID="${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}"
           # Import NSG
-          terraform -chdir=infra import azurerm_network_security_group.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
+          terraform -chdir=infra/terraform import azurerm_network_security_group.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
           # Import VNet
-          terraform -chdir=infra import azurerm_virtual_network.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet" || true
+          terraform -chdir=infra/terraform import azurerm_virtual_network.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet" || true
           # Import Subnet
-          terraform -chdir=infra import azurerm_subnet.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet/subnets/projet-python-subnet" || true
+          terraform -chdir=infra/terraform import azurerm_subnet.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/virtualNetworks/projet-python-vnet/subnets/projet-python-subnet" || true
           # Import NIC principale
-          terraform -chdir=infra import azurerm_network_interface.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-python-nic" || true
+          terraform -chdir=infra/terraform import azurerm_network_interface.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-python-nic" || true
           # Import NIC Grafana
-          terraform -chdir=infra import azurerm_network_interface.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-grafana-nic" || true
+          terraform -chdir=infra/terraform import azurerm_network_interface.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-grafana-nic" || true
           # Import association NSG <-> NIC principale
-          terraform -chdir=infra import azurerm_network_interface_security_group_association.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-python-nic|/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
+          terraform -chdir=infra/terraform import azurerm_network_interface_security_group_association.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-python-nic|/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
           # Import association NSG <-> NIC Grafana
-          terraform -chdir=infra import azurerm_network_interface_security_group_association.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-grafana-nic|/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
+          terraform -chdir=infra/terraform import azurerm_network_interface_security_group_association.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkInterfaces/projet-grafana-nic|/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/networkSecurityGroups/projet-python-nsg" || true
           # Import VM Flask
-          terraform -chdir=infra import azurerm_linux_virtual_machine.app "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Compute/virtualMachines/projet-python-app-vm" || true
+          terraform -chdir=infra/terraform import azurerm_linux_virtual_machine.app "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Compute/virtualMachines/projet-python-app-vm" || true
           # Import VM Grafana
-          terraform -chdir=infra import azurerm_linux_virtual_machine.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Compute/virtualMachines/projet-grafana-vm" || true
+          terraform -chdir=infra/terraform import azurerm_linux_virtual_machine.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Compute/virtualMachines/projet-grafana-vm" || true
           # Import IP publique principale
-          terraform -chdir=infra import azurerm_public_ip.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-python-public-ip" || true
+          terraform -chdir=infra/terraform import azurerm_public_ip.main "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-python-public-ip" || true
           # Import IP publique Grafana
-          terraform -chdir=infra import azurerm_public_ip.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-grafana-public-ip" || true
+          terraform -chdir=infra/terraform import azurerm_public_ip.grafana "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/projet-python-rg/providers/Microsoft.Network/publicIPAddresses/projet-grafana-public-ip" || true
         shell: bash
 
       - name: Destroy existing Azure infra (optionnel)
-        run: terraform -chdir=infra destroy -auto-approve || true
+        run: terraform -chdir=infra/terraform destroy -auto-approve || true
         env:
           ARM_CLIENT_ID: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}
@@ -170,13 +170,13 @@ jobs:
         run: sleep 60
 
       - name: Apply Terraform (création/MAJ des VMs)
-        run: terraform -chdir=infra apply -auto-approve
+        run: terraform -chdir=infra/terraform apply -auto-approve
 
       - name: Get App VM public IP
         id: get_ip
         run: |
-          APP_IP=$(terraform -chdir=infra output -raw app_public_ip_address)
-          GRAFANA_IP=$(terraform -chdir=infra output -raw grafana_public_ip_address)
+          APP_IP=$(terraform -chdir=infra/terraform output -raw app_public_ip_address)
+          GRAFANA_IP=$(terraform -chdir=infra/terraform output -raw grafana_public_ip_address)
           echo "APP_IP=$APP_IP" >> $GITHUB_ENV
           echo "GRAFANA_IP=$GRAFANA_IP" >> $GITHUB_ENV
 
