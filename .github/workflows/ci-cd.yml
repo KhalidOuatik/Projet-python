@@ -259,7 +259,7 @@ jobs:
 
       - name: Analyse Greenframe (empreinte carbone)
         run: |
-          npm install -g @greenframe/cli
+          npm install -g greenframe
           greenframe analyze http://$APP_IP:5000 || true
         env:
           APP_IP: ${{ env.APP_IP }}
