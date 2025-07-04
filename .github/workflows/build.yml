@@ -4,8 +4,6 @@ on:
     workflows: ["CI/CD"]
     types:
       - completed
-    branches:
-      - main
 jobs:
   sonarqube:
     name: SonarQube
