@@ -257,9 +257,12 @@ jobs:
         run: |
           python3 integration_test.py
 
-      - name: Analyse Greenframe (empreinte carbone)
-        run: |
-          npm install -g greenframe
-          greenframe analyze http://$APP_IP:5000 || true
+      - name: Analyse SonarCloud (qualité + Green IT)
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=Projet-python
+            -Dsonar.organization=khalidouatik
+            -Dsonar.python.coverage.reportPaths=coverage.xml
         env:
-          APP_IP: ${{ env.APP_IP }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
