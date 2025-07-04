@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   flask:
-    build: ../
+    image: ${FLASK_IMAGE:-ghcr.io/<owner>/<repo>/flask-app:latest}
     ports:
       - "5000:5000"
     environment:
@@ -9,13 +9,13 @@ services:
     depends_on:
       - prometheus
   grafana:
-    image: grafana/grafana:latest
+    image: ${GRAFANA_IMAGE:-ghcr.io/<owner>/<repo>/grafana:latest}
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
   prometheus:
-    image: prom/prometheus:latest
+    image: ${PROMETHEUS_IMAGE:-ghcr.io/<owner>/<repo>/prometheus:latest}
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:

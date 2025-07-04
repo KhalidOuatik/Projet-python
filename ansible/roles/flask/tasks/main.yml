@@ -1,49 +1,9 @@
 ---
-# Rôle Flask : build et run le conteneur Flask
-- name: Copier le code Flask sur la VM
-  synchronize:
-    src: "{{ playbook_dir }}/.."
-    dest: /opt/flask_app
-    rsync_opts:
-      - "--exclude=.git"
-      - "--exclude=venv"
-      - "--exclude=__pycache__"
-      - "--exclude=ansible"
-      - "--exclude=docker"
-
-- name: Créer le dossier /opt/flask_app sur la VM
-  ansible.builtin.file:
-    path: /opt/flask_app
-    state: directory
-    owner: "{{ ansible_user | default('azureuser') }}"
-    mode: '0755'
-
-- name: Copier le Dockerfile racine dans le dossier Flask
-  ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../Dockerfile"
-    dest: /opt/flask_app/Dockerfile
-    mode: '0644'
-
-- name: Lister le contenu de /opt/flask_app
-  ansible.builtin.shell: ls -l /opt/flask_app
-  register: flask_app_ls
-
-- name: Afficher le contenu de /opt/flask_app
-  ansible.builtin.debug:
-    var: flask_app_ls.stdout_lines
-
-- name: Construire l'image Flask
-  community.docker.docker_image:
-    name: flask-app
-    tag: latest
-    build:
-      path: /opt/flask_app
-    source: build
-
-- name: Lancer le conteneur Flask
+# Rôle Flask : run le conteneur Flask depuis la registry GHCR
+- name: Lancer le conteneur Flask depuis la registry
   community.docker.docker_container:
     name: flask
-    image: flask-app:latest
+    image: "{{ lookup('env', 'FLASK_IMAGE') | default('ghcr.io/<owner>/<repo>/flask-app:latest', true) }}"
     state: started
     restart_policy: always
     published_ports:

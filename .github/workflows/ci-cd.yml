@@ -8,6 +8,7 @@ on:
       - main
       - infra-test
       - ansible-docker
+      - image-registry
 
   workflow_dispatch:
 
@@ -30,7 +31,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r app/requirements.txt
         
       - name: Run tests
         run: |
@@ -47,10 +48,50 @@ jobs:
             release.zip
             !venv/
 
+      - name: Connexion à GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build de l'image Flask
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/flask-app:${{ github.sha }} .
+
+      - name: Push de l'image Flask
+        run: |
+          docker push ghcr.io/${{ github.repository }}/flask-app:${{ github.sha }}
+
+      - name: Exporter l'URL de l'image Flask
+        run: echo "FLASK_IMAGE=ghcr.io/${{ github.repository }}/flask-app:${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Build de l'image Grafana
+        run: |
+          docker build -f docker/Dockerfile.grafana -t ghcr.io/${{ github.repository }}/grafana:${{ github.sha }} docker/
+
+      - name: Push de l'image Grafana
+        run: |
+          docker push ghcr.io/${{ github.repository }}/grafana:${{ github.sha }}
+
+      - name: Exporter l'URL de l'image Grafana
+        run: echo "GRAFANA_IMAGE=ghcr.io/${{ github.repository }}/grafana:${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Build de l'image Prometheus
+        run: |
+          docker build -f docker/Dockerfile.prometheus -t ghcr.io/${{ github.repository }}/prometheus:${{ github.sha }} docker/
+
+      - name: Push de l'image Prometheus
+        run: |
+          docker push ghcr.io/${{ github.repository }}/prometheus:${{ github.sha }}
+
+      - name: Exporter l'URL de l'image Prometheus
+        run: echo "PROMETHEUS_IMAGE=ghcr.io/${{ github.repository }}/prometheus:${{ github.sha }}" >> $GITHUB_ENV
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/infra-test' || github.ref == 'refs/heads/ansible-docker' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/infra-test' || github.ref == 'refs/heads/ansible-docker' || github.ref == 'refs/heads/image-registry' }}
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
@@ -148,45 +189,7 @@ jobs:
           echo "APP_IP=$APP_IP" >> $GITHUB_ENV
           echo "GRAFANA_IP=$GRAFANA_IP" >> $GITHUB_ENV
 
-      # --- Anciennes étapes de déploiement manuel (désormais gérées par Ansible/Docker) ---
-      # - name: Copy Flask install script and app to VM
-      #   run: |
-      #     scp -o StrictHostKeyChecking=no infra/install_flask.sh azureuser@$APP_IP:/tmp/
-      #     scp -o StrictHostKeyChecking=no release.zip azureuser@$APP_IP:/tmp/
-
-      # - name: Install Flask app on VM
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no azureuser@$APP_IP 'bash /tmp/install_flask.sh'
-
-      # - name: Copy Grafana install script to VM
-      #   run: |
-      #     scp -o StrictHostKeyChecking=no infra/install_grafana.sh azureuser@$GRAFANA_IP:/tmp/
-
-      # - name: Install Grafana on VM
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_grafana.sh'
-
-      # - name: Copy Prometheus install script to VM Grafana
-      #   run: |
-      #     scp -o StrictHostKeyChecking=no infra/install_prometheus.sh azureuser@$GRAFANA_IP:/tmp/
-
-      # - name: Install Prometheus + node_exporter on VM Grafana
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP 'bash /tmp/install_prometheus.sh'
-
-      # - name: Générer le bloc Prometheus pour Flask
-      #   run: |
-      #     echo "  - job_name: \"flask_app\"" > flask_target.yml
-      #     echo "    static_configs:" >> flask_target.yml
-      #     echo "      - targets: [\"$APP_IP:5000\"]" >> flask_target.yml
-
-      # - name: Injecter la cible Flask dans prometheus.yml sur la VM Grafana
-      #   run: |
-      #     scp -o StrictHostKeyChecking=no flask_target.yml azureuser@$GRAFANA_IP:/tmp/
-      #     ssh -o StrictHostKeyChecking=no azureuser@$GRAFANA_IP '
-      #       sudo sed -i "/scrape_configs:/r /tmp/flask_target.yml" /opt/prometheus/prometheus.yml
-      #       sudo systemctl restart prometheus
-      #     '
+      # Anciennes étapes de déploiement manuel supprimées (tout est géré via Ansible et images GHCR)
 
       - name: Installer Ansible
         run: |
@@ -255,7 +258,7 @@ jobs:
           GRAFANA_IP: ${{ env.GRAFANA_IP }}
           PROMETHEUS_IP: ${{ env.GRAFANA_IP }}
         run: |
-          python3 integration_test.py
+          python3 app/integration_test.py
 
       - name: Analyse SonarCloud (qualité + Green IT)
         uses: SonarSource/sonarcloud-github-action@v2
