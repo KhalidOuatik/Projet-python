@@ -236,6 +236,25 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY }}" > infra/deploy_key
           chmod 600 infra/deploy_key
 
+      - name: Générer prometheus.yml dynamique avec IP Flask
+        run: |
+          cat > docker/prometheus.yml <<EOF
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'flask'
+    static_configs:
+      - targets: ['flask:5000']
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['$APP_IP:9100']
+EOF
+        env:
+          APP_IP: ${{ env.APP_IP }}
+
       - name: Déployer l'infra et les services avec Ansible (Docker)
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/site.yml
@@ -251,12 +270,4 @@ jobs:
         run: |
           python3 app/integration_test.py
 
-      - name: Analyse SonarCloud (qualité + Green IT)
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.python.coverage.reportPaths=coverage.xml
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+

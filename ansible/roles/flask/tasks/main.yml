@@ -1,9 +1,19 @@
+# Déploiement de node_exporter sur la VM Flask (exposé sur le port 9100)
+- name: Lancer node_exporter (Docker)
+  community.docker.docker_container:
+    name: node_exporter
+    image: prom/node-exporter:latest
+    state: started
+    restart_policy: always
+    ports:
+      - "9100:9100"
 ---
 # Rôle Flask : run le conteneur Flask depuis la registry GHCR
+
 - name: Lancer le conteneur Flask depuis la registry
   community.docker.docker_container:
     name: flask
-    image: "{{ lookup('env', 'FLASK_IMAGE') | default('ghcr.io/<owner>/<repo>/flask-app:latest', true) }}"
+    image: "{{ lookup('env', 'FLASK_IMAGE') }}"
     state: started
     restart_policy: always
     published_ports:
