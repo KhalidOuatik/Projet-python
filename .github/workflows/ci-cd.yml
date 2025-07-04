@@ -2,15 +2,7 @@ name: Build and deploy Python app to Azure Web App - python-projet
 
 
 
-on:
-  push:
-    branches:
-      - main
-      - infra-test
-      - ansible-docker
-      - image-registry
 
-  workflow_dispatch:
 
 jobs:
   build:
@@ -253,7 +245,13 @@ jobs:
         env:
           APP_IP: ${{ env.APP_IP }}
 
+      - name: Exporter FLASK_IMAGE pour Ansible
+        run: |
+          echo "FLASK_IMAGE=ghcr.io/${{ github.repository }}:$(echo ${{ github.sha }})" >> $GITHUB_ENV
+
       - name: Déployer l'infra et les services avec Ansible (Docker)
+        env:
+          FLASK_IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/site.yml
 

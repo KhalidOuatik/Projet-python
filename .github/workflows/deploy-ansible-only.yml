@@ -11,6 +11,9 @@ on:
       grafana_ip:
         description: "IP publique de la VM Grafana (ex: 20.123.45.68)"
         required: true
+      flask_image:
+        description: "Image Docker Flask à déployer (ex: ghcr.io/monorg/monrepo/flask-app:sha)"
+        required: true
 
 jobs:
   ansible_deploy:
@@ -56,7 +59,13 @@ jobs:
           echo "  - job_name: 'node_exporter'" >> docker/prometheus.yml
           echo "    static_configs:" >> docker/prometheus.yml
           echo "      - targets: ['${{ github.event.inputs.app_ip }}:9100']" >> docker/prometheus.yml
+      - name: Exporter FLASK_IMAGE pour Ansible
+        run: |
+          echo "FLASK_IMAGE=${{ github.event.inputs.flask_image }}" >> $GITHUB_ENV
+
       - name: Déployer l'infra et les services avec Ansible (Docker)
+        env:
+          FLASK_IMAGE: ${{ github.event.inputs.flask_image }}
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/site.yml
       - name: Install integration test dependencies
