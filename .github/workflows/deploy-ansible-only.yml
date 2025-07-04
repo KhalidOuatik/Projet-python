@@ -3,6 +3,12 @@ name: Deploy only (Ansible & tests)
 description: "Déployer uniquement l'app et relancer les tests sans toucher à l'infra Azure (rapide)"
 
 on:
+  push:
+    branches:
+      - main
+      - develop
+      - ansible-docker
+      - image-registry
   workflow_dispatch:
     inputs:
       app_ip:
