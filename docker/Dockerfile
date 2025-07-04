@@ -1,7 +1,7 @@
 # Dockerfile pour l'app Flask
 FROM python:3.11-slim
 WORKDIR /app
-COPY app/requirements.txt ./
+COPY app/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 # Copier les fichiers Python nécessaires
 COPY app/app.py ./
