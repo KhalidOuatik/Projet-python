@@ -57,36 +57,48 @@ jobs:
 
       - name: Build de l'image Flask
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/flask-app:${{ github.sha }} .
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/$REPO/flask-app:${{ github.sha }} .
 
       - name: Push de l'image Flask
         run: |
-          docker push ghcr.io/${{ github.repository }}/flask-app:${{ github.sha }}
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker push ghcr.io/$REPO/flask-app:${{ github.sha }}
 
       - name: Exporter l'URL de l'image Flask
-        run: echo "FLASK_IMAGE=ghcr.io/${{ github.repository }}/flask-app:${{ github.sha }}" >> $GITHUB_ENV
+        run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "FLASK_IMAGE=ghcr.io/$REPO/flask-app:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Build de l'image Grafana
         run: |
-          docker build -f docker/Dockerfile.grafana -t ghcr.io/${{ github.repository }}/grafana:${{ github.sha }} docker/
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker build -f docker/Dockerfile.grafana -t ghcr.io/$REPO/grafana:${{ github.sha }} docker/
 
       - name: Push de l'image Grafana
         run: |
-          docker push ghcr.io/${{ github.repository }}/grafana:${{ github.sha }}
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker push ghcr.io/$REPO/grafana:${{ github.sha }}
 
       - name: Exporter l'URL de l'image Grafana
-        run: echo "GRAFANA_IMAGE=ghcr.io/${{ github.repository }}/grafana:${{ github.sha }}" >> $GITHUB_ENV
+        run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "GRAFANA_IMAGE=ghcr.io/$REPO/grafana:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Build de l'image Prometheus
         run: |
-          docker build -f docker/Dockerfile.prometheus -t ghcr.io/${{ github.repository }}/prometheus:${{ github.sha }} docker/
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker build -f docker/Dockerfile.prometheus -t ghcr.io/$REPO/prometheus:${{ github.sha }} docker/
 
       - name: Push de l'image Prometheus
         run: |
-          docker push ghcr.io/${{ github.repository }}/prometheus:${{ github.sha }}
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker push ghcr.io/$REPO/prometheus:${{ github.sha }}
 
       - name: Exporter l'URL de l'image Prometheus
-        run: echo "PROMETHEUS_IMAGE=ghcr.io/${{ github.repository }}/prometheus:${{ github.sha }}" >> $GITHUB_ENV
+        run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "PROMETHEUS_IMAGE=ghcr.io/$REPO/prometheus:${{ github.sha }}" >> $GITHUB_ENV
 
   deploy:
     needs: build
