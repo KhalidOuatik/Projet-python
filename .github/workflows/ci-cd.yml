@@ -253,14 +253,18 @@ jobs:
         env:
           APP_IP: ${{ env.APP_IP }}
 
-      - name: Exporter FLASK_IMAGE pour Ansible
+      - name: Exporter FLASK_IMAGE pour Ansible (toujours en minuscules)
         run: |
-          echo "FLASK_IMAGE=ghcr.io/${{ github.repository }}:$(echo ${{ github.sha }})" >> $GITHUB_ENV
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "FLASK_IMAGE=ghcr.io/$REPO/flask-app:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Déployer l'infra et les services avec Ansible (Docker)
         env:
           FLASK_IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
         run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          export FLASK_IMAGE=ghcr.io/$REPO/flask-app:${{ github.sha }}
+          ansible-playbook -i ansible/inventory.ini ansible/site.yml
           ansible-playbook -i ansible/inventory.ini ansible/site.yml
 
       - name: Install integration test dependencies
