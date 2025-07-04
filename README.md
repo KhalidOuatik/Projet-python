@@ -41,7 +41,7 @@ Ce projet déploie automatiquement une stack applicative Python (Flask) monitor�
 - **IaC** : Terraform
 - **Déploiement** : Ansible, Docker, Docker Compose
 - **App** : Python 3.9+, Flask, prometheus_flask_exporter
-- **Monitoring** : Prometheus, Grafana, node_exporter
+- **Monitoring** : Prometheus (image officielle), Grafana (image officielle), node_exporter
 - **CI/CD** : GitHub Actions
 - **Qualité** : SonarQube Cloud (SonarCloud)
 
@@ -84,6 +84,7 @@ Ou pour la couverture :
 
 ## Lancer les tests d’intégration manuellement
 ```bash
+cd app
 pip install -r requirements.txt
 python3 integration_test.py
 ```
@@ -91,12 +92,11 @@ python3 integration_test.py
 ---
 
 ## Structure du projet
-- `app.py` : Application Flask
-- `integration_test.py` : Tests d’intégration
-- `Dockerfile` : Build Flask (Gunicorn)
-- `docker/docker-compose.yml` : Stack monitoring
+- `app/` : Code Python (Flask, tests, requirements, templates)
+- `docker/Dockerfile` : Build Flask (Gunicorn)
+- `docker/docker-compose.yml` et `docker/monitoring-compose.yml` : Stack monitoring (Grafana, Prometheus, node_exporter)
 - `ansible/` : Playbooks, rôles, inventaire
-- `infra/` : Fichiers Terraform
+- `infra/terraform/` : Fichiers Terraform
 - `.github/workflows/ci-cd.yml` : Pipeline CI/CD
 - `sonar-project.properties` : Config SonarQube
 

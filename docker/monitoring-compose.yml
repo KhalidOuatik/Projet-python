@@ -1,13 +1,13 @@
 version: '3.8'
 services:
   grafana:
-    image: ${GRAFANA_IMAGE:-ghcr.io/<owner>/<repo>/grafana:latest}
+    image: ${GRAFANA_IMAGE:-grafana/grafana:latest}
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
   prometheus:
-    image: ${PROMETHEUS_IMAGE:-ghcr.io/<owner>/<repo>/prometheus:latest}
+    image: ${PROMETHEUS_IMAGE:-prom/prometheus:latest}
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
