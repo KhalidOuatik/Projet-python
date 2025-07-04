@@ -49,16 +49,3 @@
     published_ports:
       - "5000:5000"
 
-- name: Vérifier que le conteneur Flask tourne
-  community.docker.docker_container_info:
-    name: flask
-  register: flask_container_info
-
-- name: Afficher l'état du conteneur Flask
-  ansible.builtin.debug:
-    msg: >-
-      {% if flask_container_info is defined and flask_container_info.containers is defined and flask_container_info.containers|length > 0 %}
-        Conteneur Flask running: {{ flask_container_info.containers[0].State.Running }}
-      {% else %}
-        Conteneur Flask absent ou non trouvé
-      {% endif %}
