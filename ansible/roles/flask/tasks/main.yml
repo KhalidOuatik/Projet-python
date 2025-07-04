@@ -7,9 +7,8 @@
     restart_policy: always
     ports:
       - "9100:9100"
----
-# Rôle Flask : run le conteneur Flask depuis la registry GHCR
 
+# Rôle Flask : run le conteneur Flask depuis la registry GHCR
 - name: Lancer le conteneur Flask depuis la registry
   community.docker.docker_container:
     name: flask
