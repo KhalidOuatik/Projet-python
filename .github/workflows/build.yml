@@ -1,9 +1,10 @@
 name: Build (SonarQube)
 on:
   workflow_run:
-    workflows: ["CI/CD"]
+    workflows: ["Build and deploy Python app to Azure Web App - python-projet"]
     types:
       - completed
+  workflow_dispatch:
 jobs:
   sonarqube:
     name: SonarQube
